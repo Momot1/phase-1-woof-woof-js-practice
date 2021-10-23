@@ -1,17 +1,22 @@
 document.addEventListener('DOMContentLoaded', () => {
     loadDogs()
+    dealWithFilter()
 }) 
 
-function loadDogs(){
+function loadDogs(filter = false){
     const dogBar = document.getElementById('dog-bar')
+    dogBar.innerHTML = ''
     fetch('http://localhost:3000/pups')
     .then(resp => resp.json())
     .then(dogs => {
         for(const dog of dogs){
             const span = document.createElement('span')
             span.textContent = dog.name
-            dogBar.appendChild(span)
-            console.log(dog)
+            if(filter === false){
+                dogBar.appendChild(span)
+            } else if(filter === true && dog.isGoodDog === true){
+                dogBar.appendChild(span)
+            }
 
             span.addEventListener('click', () => {
                 dealWithChosenDog(dog)
@@ -27,8 +32,6 @@ function dealWithChosenDog(dog){
     const img = document.createElement('img')
     const name = document.createElement('h2')
     const isGoodDog = document.createElement('button')
-
-
 
     img.src = dog.image
     name.textContent = dog.name
@@ -63,5 +66,19 @@ function updateDog(dog, isDogGoodDog){
             Accept: 'application/json'
         },
         body: JSON.stringify({'isGoodDog': isDogGoodDog})
+    })
+}
+
+function dealWithFilter(){
+    const filter = document.getElementById('good-dog-filter')
+
+    filter.addEventListener('click', () => {
+        if(filter.textContent === 'Filter good dogs: OFF'){
+            filter.textContent = 'Filter good dogs: ON'
+            loadDogs(true)
+        } else{
+            filter.textContent = 'Filter good dogs: OFF'
+            loadDogs()
+        }
     })
 }
